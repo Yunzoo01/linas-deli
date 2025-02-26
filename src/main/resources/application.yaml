@@ -14,7 +14,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: update  # Updates schema automatically (use validate/none in production)
+      ddl-auto: create  # Updates schema automatically (use validate/none in production)
     show-sql: true  # Logs executed SQL queries
     properties:
       hibernate:
