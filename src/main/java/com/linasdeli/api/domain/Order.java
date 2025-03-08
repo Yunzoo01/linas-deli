@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer oid;
+    private Long oid;
 
     @ManyToOne
     @JoinColumn(name = "platter_id", nullable = false)
