@@ -1,10 +1,15 @@
 package com.linasdeli.api.service;
 
 import com.linasdeli.api.domain.Order;
+import com.linasdeli.api.dto.request.OrderRequestDTO;
+import com.linasdeli.api.dto.response.OrderResponseDTO;
 import com.linasdeli.api.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 
 @Slf4j
@@ -17,25 +22,39 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
-    // ✅ 주문 생성 (Create)
-    public Order createOrder(Order order) {
-        return orderRepository.save(order);
+    // ✅ 주문 생성 (Create) - DTO 활용
+    public OrderResponseDTO createOrder(OrderRequestDTO orderRequestDTO) {
+        Order order = new Order();
+        order.setCustomerName(orderRequestDTO.getCustomerName());
+        order.setEmail(orderRequestDTO.getEmail());
+
+        Order savedOrder = orderRepository.save(order);
+        return new OrderResponseDTO(savedOrder);
     }
 
-    // ✅ 주문 조회 (Read)
-    public Optional<Order> getOrderById(Long id) {
-        return orderRepository.findById(id);
+    // ✅ Order 목록 페이징 및 검색 (DTO 변환)
+    public Page<OrderResponseDTO> getOrders(Pageable pageable, String keyword) {
+        Page<Order> orders = (keyword == null || keyword.isEmpty())
+                ? orderRepository.findAll(pageable)
+                : orderRepository.findByEmailContainingIgnoreCaseOrderByOidDesc(keyword, pageable);
+
+        return orders.map(OrderResponseDTO::new);
     }
 
-    // ✅ 주문 수정 (Update)
-    public Order updateOrder(Long id, Order updatedOrder) {
+    // ✅ 주문 조회 (Read) - DTO 활용
+    public Optional<OrderResponseDTO> getOrderById(Long id) {
+        return orderRepository.findById(id).map(OrderResponseDTO::new);
+    }
+
+    // ✅ 주문 수정 (Update) - DTO 활용
+    public OrderResponseDTO updateOrder(Long id, OrderRequestDTO orderRequestDTO) {
         return orderRepository.findById(id)
                 .map(order -> {
-                    order.setCustomerName(updatedOrder.getCustomerName());
-                    order.setPhone(updatedOrder.getPhone());
-                    order.setEmail(updatedOrder.getEmail());
-                    order.setMessage(updatedOrder.getMessage());
-                    return orderRepository.save(order);
+                    order.setCustomerName(orderRequestDTO.getCustomerName());
+                    order.setEmail(orderRequestDTO.getEmail());
+
+                    Order updatedOrder = orderRepository.save(order);
+                    return new OrderResponseDTO(updatedOrder);
                 }).orElseThrow(() -> new RuntimeException("Order not found"));
     }
 
