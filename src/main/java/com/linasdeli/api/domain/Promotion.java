@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class Promotion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer promotionId;
+    private Long promotionId;
 
     @Column(nullable = false, length = 200) private String promotionTitle;
 
