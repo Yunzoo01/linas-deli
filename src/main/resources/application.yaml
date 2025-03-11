@@ -7,14 +7,14 @@ spring:
 
   datasource:
     url: jdbc:mysql://localhost:3306/linas_db  # MySQL database URL
-    username: ${DB_USERNAME}  # Read from environment variable
-    password: ${DB_PASSWORD}  # Read from environment variable
+    username: root  # Read from environment variable
+    password: 1234  # Read from environment variable
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: create  # Updates schema automatically (use validate/none in production)
+      ddl-auto: update  # Updates schema automatically (use validate/none in production)
     show-sql: true  # Logs executed SQL queries
     properties:
       hibernate:
