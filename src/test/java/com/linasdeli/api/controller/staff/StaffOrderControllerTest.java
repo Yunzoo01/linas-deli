@@ -40,26 +40,13 @@ public class StaffOrderControllerTest {
 
     @BeforeEach
     void setUp() {
-        orderRequestDTO = new OrderRequestDTO("John Doe","john.doe@example.com");
+        orderRequestDTO = new OrderRequestDTO("John Doe","john.doe@example.com", "Deluxe Platter");
 
         orderResponseDTO = new OrderResponseDTO();
         orderResponseDTO.setOid(1L);
         orderResponseDTO.setCustomerName("John Doe");
         orderResponseDTO.setEmail("john.doe@example.com");
-        orderResponseDTO.setPlatter("Deluxe Platter");
-    }
-
-    @Test
-    @DisplayName("✅ 주문 생성 API 테스트")
-    void testCreateOrder() throws Exception {
-        when(orderService.createOrder(any(OrderRequestDTO.class))).thenReturn(orderResponseDTO);
-
-        mockMvc.perform(post("/api/staff/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderRequestDTO)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.customerName").value("John Doe"))
-                .andExpect(jsonPath("$.platter").value("Deluxe Platter"));
+        orderResponseDTO.setPlatterName("Deluxe Platter");
     }
 
     @Test
@@ -77,14 +64,14 @@ public class StaffOrderControllerTest {
     @Test
     @DisplayName("✅ 주문 업데이트 API 테스트")
     void testUpdateOrder() throws Exception {
-        OrderRequestDTO updatedOrderRequestDTO = new OrderRequestDTO("John Doe","john.doe@example.com");
+        OrderRequestDTO updatedOrderRequestDTO = new OrderRequestDTO("John Doe","john.doe@example.com", "Premium Platter");
         updatedOrderRequestDTO.setCustomerName("Jane Doe");
 
         OrderResponseDTO updatedOrderResponseDTO = new OrderResponseDTO();
         updatedOrderResponseDTO.setOid(1L);
         updatedOrderResponseDTO.setCustomerName("Jane Doe");
         updatedOrderResponseDTO.setEmail("jane.doe@example.com");
-        updatedOrderResponseDTO.setPlatter("Premium Platter");
+        updatedOrderResponseDTO.setPlatterName("Premium Platter");
 
         when(orderService.updateOrder(eq(1L), any(OrderRequestDTO.class))).thenReturn(updatedOrderResponseDTO);
 

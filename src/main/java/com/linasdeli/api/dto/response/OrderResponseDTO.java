@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class OrderResponseDTO {
     private Long oid;
-    private String platter;
+    private String platterName;
     private String customerName;
     private String email;
 
@@ -16,7 +16,7 @@ public class OrderResponseDTO {
 
     public OrderResponseDTO(Order order) {
         this.oid = order.getOid();
-        this.platter = order.getPlatter().getPlatterName();
+        this.platterName = (order.getPlatter() != null) ? order.getPlatter().getPlatterName() : "No Platter";
         this.customerName = order.getCustomerName();
         this.email = order.getEmail();
     }
@@ -25,8 +25,8 @@ public class OrderResponseDTO {
         this.oid = oid;
     }
 
-    public void setPlatter(String platter) {
-        this.platter = platter;
+    public void setPlatterName(String platter) {
+        this.platterName = platter;
     }
 
     public void setCustomerName(String customerName) {

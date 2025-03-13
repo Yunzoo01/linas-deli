@@ -42,6 +42,9 @@ public class Order {
     @Column(length = 1000)
     private String message;
 
+    @Column(length = 20)
+    private String status;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
