@@ -1,7 +1,6 @@
 package com.linasdeli.api.dto.response;
 
 import com.linasdeli.api.domain.Order;
-import com.linasdeli.api.domain.Platter;
 import lombok.Getter;
 
 @Getter
@@ -10,6 +9,7 @@ public class OrderResponseDTO {
     private String platterName;
     private String customerName;
     private String email;
+    private String status;
 
     public OrderResponseDTO() {
     }
@@ -19,6 +19,7 @@ public class OrderResponseDTO {
         this.platterName = (order.getPlatter() != null) ? order.getPlatter().getPlatterName() : "No Platter";
         this.customerName = order.getCustomerName();
         this.email = order.getEmail();
+        this.status = order.getStatus();
     }
 
     public void setOid(Long oid) {
@@ -36,4 +37,9 @@ public class OrderResponseDTO {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
+
