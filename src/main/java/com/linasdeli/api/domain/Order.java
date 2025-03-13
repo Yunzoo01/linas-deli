@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 /**
  * Order entity - Stores customer order history
  */
@@ -25,7 +28,7 @@ public class Order {
     private LocalDateTime date;
 
     @Column(nullable = false)
-    private Integer time;
+    private LocalTime time;
 
     @Column(length = 100, nullable = false)
     private String customerName;
