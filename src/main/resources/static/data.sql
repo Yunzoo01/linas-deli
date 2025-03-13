@@ -3,12 +3,12 @@ INSERT INTO platter(platter_id, platter_name) VALUES
                                                 (2,'set B'),
                                                 (3,'set C');
 
-INSERT INTO platter_order (platter_id, customer_name, phone, email, date, time, created_at, updated_at) VALUES
-                                                                                                            (1, 'John Doe', '123-456-7890', 'john@example.com', '2024-02-20', 12, '2024-02-20 10:00:00', '2024-02-20 10:00:00'),
-                                                                                                            (1, 'Jane Doe', '987-654-3210', 'jane@example.com', '2024-02-21', 14, '2024-02-21 11:30:00', '2024-02-21 11:30:00'),
-                                                                                                            (2, 'Alice Smith', '111-222-3333', 'alice@example.com', '2024-02-22', 16, '2024-02-22 14:45:00', '2024-02-22 14:45:00'),
-                                                                                                            (3, 'Bob Brown', '444-555-6666', 'bob@example.com', '2024-02-23', 18, '2024-02-23 16:15:00', '2024-02-23 16:15:00'),
-                                                                                                            (2, 'Charlie White', '777-888-9999', 'charlie@example.com', '2024-02-24', 20, '2024-02-24 18:00:00', '2024-02-24 18:00:00');
+INSERT INTO platter_order (platter_id, customer_name, phone, email, date, time, status, created_at, updated_at) VALUES
+                                                                                                            (1, 'John Doe', '123-456-7890', 'john@example.com', '2024-02-20', 12, 'completed', '2024-02-20 10:00:00', '2024-02-20 10:00:00'),
+                                                                                                            (1, 'Jane Doe', '987-654-3210', 'jane@example.com', '2024-02-21', 14, 'completed', '2024-02-21 11:30:00', '2024-02-21 11:30:00'),
+                                                                                                            (2, 'Alice Smith', '111-222-3333', 'alice@example.com', '2024-02-22', 16, 'completed', '2024-02-22 14:45:00', '2024-02-22 14:45:00'),
+                                                                                                            (3, 'Bob Brown', '444-555-6666', 'bob@example.com', '2024-02-23', 18, 'in progress', '2024-02-23 16:15:00', '2024-02-23 16:15:00'),
+                                                                                                            (2, 'Charlie White', '777-888-9999', 'charlie@example.com', '2024-02-24', 20, 'decline', '2024-02-24 18:00:00', '2024-02-24 18:00:00');
 -- 첫 번째 프로모션
 INSERT INTO promotion (start_date, end_date, promotion_title, promotion_image_name, promotion_image_url, created_at, updated_at)
 VALUES
