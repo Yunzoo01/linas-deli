@@ -4,6 +4,7 @@ import com.linasdeli.api.domain.Platter;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Time;
 import java.time.LocalDate;
 
 @Getter
@@ -15,11 +16,11 @@ public class OrderRequestDTO {
     private String phone;
     private String status;
     private LocalDate date;
-    private String time;
+    private Time time;
     private String allergy;
     private String message;
 
-    public OrderRequestDTO(String customerName, String email, String platter, String phone, String status, LocalDate date, String time, String allergy, String message) {
+    public OrderRequestDTO(String customerName, String email, String platter, String phone, String status, LocalDate date, Time time, String allergy, String message) {
         this.customerName = customerName;
         this.email = email;
         this.platter = platter;
