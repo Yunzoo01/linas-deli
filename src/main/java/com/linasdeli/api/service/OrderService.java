@@ -1,11 +1,13 @@
 package com.linasdeli.api.service;
 
 import com.linasdeli.api.domain.Order;
+import com.linasdeli.api.domain.Platter;
 import com.linasdeli.api.dto.OrderStatusCountDTO;
 import com.linasdeli.api.dto.request.OrderRequestDTO;
 import com.linasdeli.api.dto.response.OrderDTO;
 import com.linasdeli.api.dto.response.OrderResponseDTO;
 import com.linasdeli.api.repository.OrderRepository;
+import com.linasdeli.api.repository.PlatterRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,7 +16,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,21 +26,37 @@ import java.util.Optional;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final PlatterRepository platterRepository;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, PlatterRepository platterRepository) {
         this.orderRepository = orderRepository;
+        this.platterRepository = platterRepository;
     }
 
+
     // ✅ 주문 생성 (Create) - DTO 활용
-//    public OrderResponseDTO createOrder(OrderRequestDTO orderRequestDTO) {
-//        Order order = new Order();
-//        order.setCustomerName(orderRequestDTO.getCustomerName());
-//        order.setEmail(orderRequestDTO.getEmail());
-//
-//        Order savedOrder = orderRepository.save(order);
-//        return new OrderResponseDTO(savedOrder);
-//    }
+    public OrderDTO createOrder(OrderRequestDTO orderRequestDTO) {
+        Order order = new Order();
+        log.info(orderRequestDTO.getPlatter());
+        Platter platterEntity = platterRepository.findByPlatterName(orderRequestDTO.getPlatter()+" BOX")
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 플래터입니다.:"));
+
+        order.setPlatter(platterEntity);
+        order.setCustomerName(orderRequestDTO.getCustomerName());
+        order.setEmail(orderRequestDTO.getEmail());
+        order.setPhone(orderRequestDTO.getPhone());
+        order.setAllergy(orderRequestDTO.getAllergy());
+        order.setMessage(orderRequestDTO.getMessage());
+        order.setStatus("in progress");
+        order.setDate(orderRequestDTO.getDate().atStartOfDay());
+        order.setTime(orderRequestDTO.getTime().toLocalTime());
+        order.setCreatedAt(LocalDateTime.now());
+        order.setUpdatedAt(LocalDateTime.now());
+
+        Order savedOrder = orderRepository.save(order);
+        return new OrderDTO(savedOrder);
+    }
 
     // ✅ Order 목록 페이징 및 검색 (DTO 변환)
     public Page<OrderDTO> getOrders(Pageable pageable, String keyword, String status) {
