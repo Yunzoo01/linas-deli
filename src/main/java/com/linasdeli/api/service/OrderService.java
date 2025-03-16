@@ -2,25 +2,19 @@ package com.linasdeli.api.service;
 
 import com.linasdeli.api.domain.Order;
 import com.linasdeli.api.domain.Platter;
+import com.linasdeli.api.dto.OrderDTO;
 import com.linasdeli.api.dto.OrderStatusCountDTO;
 import com.linasdeli.api.dto.request.OrderRequestDTO;
-import com.linasdeli.api.dto.response.OrderDTO;
-import com.linasdeli.api.dto.response.OrderResponseDTO;
 import com.linasdeli.api.repository.OrderRepository;
 import com.linasdeli.api.repository.PlatterRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -38,8 +32,8 @@ public class OrderService {
     // ✅ 주문 생성 (Create) - DTO 활용
     public OrderDTO createOrder(OrderRequestDTO orderRequestDTO) {
         Order order = new Order();
-        log.info(orderRequestDTO.getPlatter());
-        Platter platterEntity = platterRepository.findByPlatterName(orderRequestDTO.getPlatter()+" BOX")
+        log.info(orderRequestDTO.getPlatterName());
+        Platter platterEntity = platterRepository.findByPlatterName(orderRequestDTO.getPlatterName()+" BOX")
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 플래터입니다.:"));
 
         order.setPlatter(platterEntity);
