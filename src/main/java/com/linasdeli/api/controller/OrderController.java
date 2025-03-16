@@ -1,7 +1,7 @@
 package com.linasdeli.api.controller;
 
+import com.linasdeli.api.dto.OrderDTO;
 import com.linasdeli.api.dto.request.OrderRequestDTO;
-import com.linasdeli.api.dto.response.OrderDTO;
 import com.linasdeli.api.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

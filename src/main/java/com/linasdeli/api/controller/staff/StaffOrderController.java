@@ -1,10 +1,11 @@
 package com.linasdeli.api.controller.staff;
 
+import com.linasdeli.api.dto.OrderDTO;
 import com.linasdeli.api.dto.OrderStatusCountDTO;
 import com.linasdeli.api.dto.request.OrderRequestDTO;
-import com.linasdeli.api.dto.response.OrderDTO;
 import com.linasdeli.api.dto.response.OrderResponseDTO;
 import com.linasdeli.api.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +52,7 @@ public class StaffOrderController {
 //
 //    // ✅ 주문 수정 (PUT) - DTO 활용
     @PutMapping("/{id}")
-    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderRequestDTO orderRequestDTO) {
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @Valid @RequestBody OrderRequestDTO orderRequestDTO) {
         OrderDTO updatedOrder = orderService.updateOrder(id, orderRequestDTO);
         return ResponseEntity.ok(updatedOrder);
     }

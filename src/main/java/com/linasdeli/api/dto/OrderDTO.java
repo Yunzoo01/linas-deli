@@ -1,4 +1,4 @@
-package com.linasdeli.api.dto.response;
+package com.linasdeli.api.dto;
 
 import com.linasdeli.api.domain.Order;
 import lombok.Getter;
@@ -33,7 +33,7 @@ public class OrderDTO {
         this.email = order.getEmail();
         this.status = order.getStatus();
         this.date = order.getDate().toLocalDate();
-        this.time = order.getTime().format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.time = order.getTime().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         this.allergy = order.getAllergy();
         this.message = order.getMessage();
     }
@@ -67,7 +67,7 @@ public class OrderDTO {
     }
 
     public void setTime(LocalTime time) {
-        this.time = time.format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.time = time.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 
     public void setMessage(String message) {
