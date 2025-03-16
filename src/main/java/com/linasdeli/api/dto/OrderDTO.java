@@ -1,30 +1,89 @@
-package com.linasdeli.api.dto;
+package com.linasdeli.api.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.linasdeli.api.domain.Order;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
 public class OrderDTO {
     private Long oid;
-    private PlatterDTO platter;
-    private LocalDate date;
-    private Integer time;
+    private String platterName;
     private String customerName;
-    private String phone;
-    private String allergy;
     private String email;
+    private String phone;
+    private String status;
+    private LocalDate date;
+    private String time;
+    private String allergy;
     private String message;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
+
+    public OrderDTO() {
+    }
+
+    public OrderDTO(Order order) {
+        this.oid = order.getOid();
+        this.platterName = (order.getPlatter() != null) ? order.getPlatter().getPlatterName() : "No Platter";
+        this.customerName = order.getCustomerName();
+        this.phone = order.getPhone();
+        this.email = order.getEmail();
+        this.status = order.getStatus();
+        this.date = order.getDate().toLocalDate();
+        this.time = order.getTime().format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.allergy = order.getAllergy();
+        this.message = order.getMessage();
+    }
+
+    public void setOid(Long oid) {
+        this.oid = oid;
+    }
+
+    public void setPlatterName(String platter) {
+        this.platterName = platter;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date.toLocalDate();
+    }
+
+    public void setTime(LocalTime time) {
+        this.time = time.format(DateTimeFormatter.ofPattern("HH:mm"));
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public void setAllergy(String allergy) {
+        this.allergy = allergy;
+    }
 }
-
-
-
-
 
