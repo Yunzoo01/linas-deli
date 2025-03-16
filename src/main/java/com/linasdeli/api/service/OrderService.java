@@ -75,16 +75,16 @@ public class OrderService {
 //    }
 
     // ✅ 주문 수정 (Update) - DTO 활용
-//    public OrderResponseDTO updateOrder(Long id, OrderRequestDTO orderRequestDTO) {
-//        return orderRepository.findById(id)
-//                .map(order -> {
-//                    order.setCustomerName(orderRequestDTO.getCustomerName());
-//                    order.setEmail(orderRequestDTO.getEmail());
-//
-//                    Order updatedOrder = orderRepository.save(order);
-//                    return new OrderResponseDTO(updatedOrder);
-//                }).orElseThrow(() -> new RuntimeException("Order not found"));
-//    }
+    public OrderDTO updateOrder(Long id, OrderRequestDTO orderRequestDTO) {
+        return orderRepository.findById(id)
+                .map(order -> {
+                    order.setCustomerName(orderRequestDTO.getCustomerName());
+                    order.setEmail(orderRequestDTO.getEmail());
+
+                    Order updatedOrder = orderRepository.save(order);
+                    return new OrderDTO(updatedOrder);
+                }).orElseThrow(() -> new RuntimeException("Order not found"));
+    }
 //
 //    // ✅ 주문 삭제 (Delete)
 //    public void deleteOrder(Long id) {
