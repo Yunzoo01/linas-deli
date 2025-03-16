@@ -50,11 +50,11 @@ public class StaffOrderController {
 //    }
 //
 //    // ✅ 주문 수정 (PUT) - DTO 활용
-//    @PutMapping("/{id}")
-//    public ResponseEntity<OrderResponseDTO> updateOrder(@PathVariable Long id, @RequestBody OrderRequestDTO orderRequestDTO) {
-//        OrderResponseDTO updatedOrder = orderService.updateOrder(id, orderRequestDTO);
-//        return ResponseEntity.ok(updatedOrder);
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderRequestDTO orderRequestDTO) {
+        OrderDTO updatedOrder = orderService.updateOrder(id, orderRequestDTO);
+        return ResponseEntity.ok(updatedOrder);
+    }
 //
 //    // ✅ 주문 삭제 (DELETE)
 //    @DeleteMapping("/{id}")
