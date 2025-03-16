@@ -80,6 +80,12 @@ public class OrderService {
                 .map(order -> {
                     order.setCustomerName(orderRequestDTO.getCustomerName());
                     order.setEmail(orderRequestDTO.getEmail());
+                    order.setAllergy(orderRequestDTO.getAllergy());
+                    order.setCustomerName(orderRequestDTO.getCustomerName());
+                    order.setMessage(orderRequestDTO.getMessage());
+                    //time, date 추가
+                    //status 수정가능하도록 추가
+                    //platter 수정가능하도록 추가
 
                     Order updatedOrder = orderRepository.save(order);
                     return new OrderDTO(updatedOrder);
