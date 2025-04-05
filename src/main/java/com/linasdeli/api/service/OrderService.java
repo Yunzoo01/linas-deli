@@ -11,10 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -83,10 +86,6 @@ public class OrderService {
         return statusCounts;
     }
 
-    // ✅ 주문 조회 (Read) - DTO 활용
-//    public Optional<OrderResponseDTO> getOrderById(Long id) {
-//        return orderRepository.findById(id).map(OrderResponseDTO::new);
-//    }
 
     // ✅ 주문 수정 (Update) - DTO 활용
     public OrderDTO updateOrder(Long id, OrderRequestDTO orderRequestDTO) {
@@ -105,10 +104,24 @@ public class OrderService {
                     return new OrderDTO(updatedOrder);
                 }).orElseThrow(() -> new RuntimeException("Order not found"));
     }
-//
-//    // ✅ 주문 삭제 (Delete)
-//    public void deleteOrder(Long id) {
-//        orderRepository.deleteById(id);
-//    }
 
+    public void updateOrderStatus(Long orderId, String newStatus) {
+        Optional<Order> orderOptional = orderRepository.findById(orderId);
+        if (orderOptional.isPresent()) {
+            Order order = orderOptional.get();
+            // 상태 값 유효성 검사 (선택 사항)
+            if (isValidStatus(newStatus.toUpperCase())) {
+                order.setStatus(newStatus.toLowerCase()); // DB에 소문자로 저장
+                orderRepository.save(order);
+            } else {
+                throw new IllegalArgumentException("Invalid order status: " + newStatus);
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found with ID: " + orderId);
+        }
+    }
+
+    private boolean isValidStatus(String status) {
+        return status.equals("IN PROGRESS") || status.equals("COMPLETED") || status.equals("DECLINE") || status.equals("COMPLETED_DECLINE");
+    }
 }

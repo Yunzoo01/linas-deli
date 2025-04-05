@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -56,6 +57,21 @@ public class StaffOrderController {
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @Valid @RequestBody OrderRequestDTO orderRequestDTO) {
         OrderDTO updatedOrder = orderService.updateOrder(id, orderRequestDTO);
         return ResponseEntity.ok(updatedOrder);
+    }
+
+    @PutMapping("/updateStatus/{orderId}")
+    @PreAuthorize("hasAuthority('ROLE_STAFF')")
+    public ResponseEntity<String> updateOrderStatus(@PathVariable Long orderId, @RequestParam String status) {
+        try {
+            orderService.updateOrderStatus(orderId, status);
+            return ResponseEntity.ok("Order status updated to " + status);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to update order status.");
+        }
     }
 
 }
