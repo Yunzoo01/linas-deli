@@ -1,6 +1,5 @@
 package com.linasdeli.api.dto.request;
 
-import com.linasdeli.api.domain.Platter;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

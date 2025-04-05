@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,14 +27,21 @@ public class StaffOrderController {
         this.orderService = orderService;
     }
 
+    @GetMapping("/test")
+    @PreAuthorize("hasAuthority('ROLE_STAFF')")
+    public ResponseEntity<String> staffTestEndpoint() {
+        return ResponseEntity.ok("Staff access granted!");
+    }
+
     // ✅ 오더 목록 조회 (페이징 및 검색) - DTO 활용
     @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_STAFF')")
     public ResponseEntity<OrderResponseDTO> getOrders(
             Pageable pageable,
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "status", required = false) String status
             ) {
-
+        log.info("getOrders called");
         Page<OrderDTO> orders = orderService.getOrders(pageable, keyword, status);
         List<OrderStatusCountDTO> orderStatusCount = orderService.countOrdersByStatus();
 
@@ -42,25 +50,12 @@ public class StaffOrderController {
 
     }
 
-    // ✅ 주문 조회 (GET) - ID 기반 DTO 변환
-//    @GetMapping("/{id}")
-//    public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable Long id) {
-//        return orderService.getOrderById(id)
-//                .map(ResponseEntity::ok)
-//                .orElseGet(() -> ResponseEntity.notFound().build());
-//    }
-//
 //    // ✅ 주문 수정 (PUT) - DTO 활용
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_STAFF')")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @Valid @RequestBody OrderRequestDTO orderRequestDTO) {
         OrderDTO updatedOrder = orderService.updateOrder(id, orderRequestDTO);
         return ResponseEntity.ok(updatedOrder);
     }
-//
-//    // ✅ 주문 삭제 (DELETE)
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
-//        orderService.deleteOrder(id);
-//        return ResponseEntity.ok().build();
-//    }
+
 }
