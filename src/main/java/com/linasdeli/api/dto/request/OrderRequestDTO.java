@@ -24,7 +24,6 @@ public class OrderRequestDTO {
 
     private String phone;
 
-    @NotBlank(message = "Status is required")
     private String status;
 
     @NotNull(message = "Date is required")
