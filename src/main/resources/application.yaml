@@ -1,5 +1,9 @@
 server:
   port: 8080  # Server runs on port 8080
+  session:
+    timeout: 30m
+    cookie:
+      same-site: Lax
 
 spring:
   application:
@@ -32,3 +36,10 @@ logging:
     org.springframework.web: DEBUG  # Debug logs for web requests
     org.hibernate.SQL: DEBUG  # Logs executed SQL queries
     org.hibernate.type.descriptor.sql: TRACE  # Logs SQL parameter values
+#    org.springframework.security : TRACE
+#    org.springframework.security.web.context.SecurityContextPersistenceFilter: DEBUG
+
+app:
+  cors:
+    allowed-origins:
+      - "http://localhost:5173"  # 프론트엔드 개발 서버 URL

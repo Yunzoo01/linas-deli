@@ -32,13 +32,16 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     testImplementation 'org.mockito:mockito-junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-core'
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
-
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.modelmapper:modelmapper:3.2.0' // 최신 버전 확인 후 사용 권장
 }
 
 tasks.named('test') {
