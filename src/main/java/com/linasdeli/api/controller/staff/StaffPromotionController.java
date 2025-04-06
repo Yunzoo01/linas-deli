@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+
 
 @Slf4j
 @RestController
@@ -29,15 +32,19 @@ public class StaffPromotionController {
     // ✅ 프로모션 생성
     @PostMapping
     public ResponseEntity<Promotion> createPromotion(
+            @RequestParam(value = "promotionTitle", required = false) String promotionTitle,
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate,
             @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
 
         // Convert strings to LocalDateTime
-        LocalDateTime start = LocalDateTime.parse(startDate);
-        LocalDateTime end = LocalDateTime.parse(endDate);
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
 
-        Promotion promotion = promotionService.createPromotion(start, end, image);
+        LocalDateTime startDateTime = start.atStartOfDay();             // 00:00:00
+        LocalDateTime endDateTime = end.atTime(23, 59, 59);             // 23:59:59
+
+        Promotion promotion = promotionService.createPromotion(promotionTitle, startDateTime, endDateTime, image);
         return new ResponseEntity<>(promotion, HttpStatus.CREATED);
     }
 
@@ -62,14 +69,15 @@ public class StaffPromotionController {
     @PutMapping("/{id}")
     public ResponseEntity<Promotion> updatePromotion(
             @PathVariable Long id,
+            @RequestParam(value = "promotionTitle", required = false) String promotionTitle,
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate", required = false) String endDate,
             @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
 
-        LocalDateTime start = (startDate != null) ? LocalDateTime.parse(startDate) : null;
-        LocalDateTime end = (endDate != null) ? LocalDateTime.parse(endDate) : null;
+        LocalDateTime start = (startDate != null) ? LocalDate.parse(startDate).atStartOfDay() : null;
+        LocalDateTime end = (endDate != null) ? LocalDate.parse(endDate).atTime(23, 59, 59) : null;
 
-        Promotion promotion = promotionService.updatePromotion(id, start, end, image);
+        Promotion promotion = promotionService.updatePromotion(id, promotionTitle, start, end, image);
         return new ResponseEntity<>(promotion, HttpStatus.OK);
     }
 
