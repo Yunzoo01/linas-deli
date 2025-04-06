@@ -44,18 +44,22 @@ public class PromotionControllerTest {
     @Test
     void givenValidPromotionDetails_whenCreatePromotion_thenReturnCreatedPromotion() throws Exception {
         // Given: Valid promotion details
+        String promotionTitle = ""; // 또는 null: 자동 생성 테스트용
         LocalDateTime startDate = LocalDateTime.of(2025, 3, 1, 0, 0);
         LocalDateTime endDate = LocalDateTime.of(2025, 3, 31, 23, 59);
+
         Promotion promotion = new Promotion();
         promotion.setStartDate(startDate);
         promotion.setEndDate(endDate);
         promotion.setPromotionTitle("Promotion from 2025-03-01 to 2025-03-31");
 
-        // When: Promotion is created
-        when(promotionService.createPromotion(startDate, endDate, null)).thenReturn(promotion);
+        // When: createPromotion 호출 예상 설정
+        when(promotionService.createPromotion(eq(promotionTitle), eq(startDate), eq(endDate), isNull()))
+                .thenReturn(promotion);
 
-        // Then: The created promotion should be returned with status 201
-        mockMvc.perform(post("/api/promotions")
+        // Then: 요청 보내고 결과 확인
+        mockMvc.perform(post("/api/staff/promotions")
+                        .param("promotionTitle", promotionTitle)
                         .param("startDate", startDate.toString())
                         .param("endDate", endDate.toString())
                         .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -64,7 +68,9 @@ public class PromotionControllerTest {
                 .andExpect(jsonPath("$.startDate").value(startDate.toString()))
                 .andExpect(jsonPath("$.endDate").value(endDate.toString()));
 
-        verify(promotionService, times(1)).createPromotion(startDate, endDate, null);
+        // Verify: promotionService가 호출됐는지 확인
+        verify(promotionService, times(1))
+                .createPromotion(eq(promotionTitle), eq(startDate), eq(endDate), isNull());
     }
 
     @Test
