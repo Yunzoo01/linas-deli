@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +32,7 @@ public class StaffPromotionController {
 
     // ✅ 프로모션 생성
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_STAFF')")
     public ResponseEntity<Promotion> createPromotion(
             @RequestParam(value = "promotionTitle", required = false) String promotionTitle,
             @RequestParam("startDate") String startDate,
@@ -50,6 +52,7 @@ public class StaffPromotionController {
 
     // ✅ 프로모션 목록 조회 (페이징 및 검색)
     @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_STAFF')")
     public ResponseEntity<Page<Promotion>> getPromotions(
             Pageable pageable,
             @RequestParam(value = "keyword", required = false) String keyword) {
@@ -60,6 +63,7 @@ public class StaffPromotionController {
 
     // ✅ 프로모션 상세 조회
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_STAFF')")
     public ResponseEntity<Promotion> getPromotionById(@PathVariable Long id) {
         Promotion promotion = promotionService.getPromotionById(id);
         return new ResponseEntity<>(promotion, HttpStatus.OK);
@@ -67,6 +71,7 @@ public class StaffPromotionController {
 
     // ✅ 프로모션 업데이트
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_STAFF')")
     public ResponseEntity<Promotion> updatePromotion(
             @PathVariable Long id,
             @RequestParam(value = "promotionTitle", required = false) String promotionTitle,
@@ -83,6 +88,7 @@ public class StaffPromotionController {
 
     // ✅ 프로모션 삭제
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_STAFF')")
     public ResponseEntity<Void> deletePromotion(@PathVariable Long id) {
         promotionService.deletePromotion(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
