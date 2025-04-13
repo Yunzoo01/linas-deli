@@ -1,4 +1,5 @@
 package com.linasdeli.api.domain;
+import com.linasdeli.api.domain.enums.AllergyType;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,12 +22,19 @@ public class Product {
     @Column(length = 100) private String imageName;
     @Column(length = 500) private String imageUrl;
     @Column(nullable = false) private String productName;
-    private String allergy;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "product_allergy", joinColumns = @JoinColumn(name = "pid"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "allergy_type")
+    private List<AllergyType> allergies;
+
     private Boolean pasteurized;
     @Column(length = 100) private String ingredientsImageName;
     @Column(length = 500) private String ingredientsImageUrl;
     @Column(length = 1000) private String description;
     @Column(length = 1000) private String servingSuggestion;
+    @Column(nullable = false) private boolean inStock = false;
 
     @ManyToOne
     @JoinColumn(name = "supplier", nullable = false)
