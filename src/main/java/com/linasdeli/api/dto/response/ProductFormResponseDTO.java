@@ -1,32 +1,34 @@
 package com.linasdeli.api.dto.response;
 
-import lombok.Data;
-import lombok.Builder;
-import java.math.BigDecimal;
+import com.linasdeli.api.domain.enums.AllergyType;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
-@Data
-@Builder
+@Getter
+@Setter
 public class ProductFormResponseDTO {
-    private Integer productId;
+    private Integer pid;
+    private Integer categoryId;
     private String productName;
     private Integer supplierId;
-    private Integer categoryId;
-    private String imageUrl;
-    private String imageName;
-    private String ingredientsImageUrl;
-    private String ingredientsImageName;
-    private String description;
-    private String servingSuggestion;
-    private List<String> allergy;
-    private Boolean pasteurized;
-
     private String priceType;
-    private BigDecimal supplierPrice;
-    private BigDecimal divisor;
-    private BigDecimal retailPrice;
-    private Integer plu;
+    private Double cost;
+    private Double salePrice;
+    private String plu;
 
     private Integer animalId;
-    private Integer countryId;
+    private Boolean pasteurized;
+    private Integer originId;
+
+    private List<AllergyType> allergies;
+
+    private String productImageName;
+    private String productImageUrl;
+    private String ingredientsImageName;
+    private String ingredientsImageUrl;
+
+    private String description;
+    private String suggestion;
 }
