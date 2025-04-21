@@ -41,17 +41,16 @@ public class StaffOrderController {
             Pageable pageable,
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "status", required = false) String status
-            ) {
+    ) {
         log.info("getOrders called");
         Page<OrderDTO> orders = orderService.getOrders(pageable, keyword, status);
         List<OrderStatusCountDTO> orderStatusCount = orderService.countOrdersByStatus();
 
         OrderResponseDTO response = new OrderResponseDTO(orders,orderStatusCount);
         return ResponseEntity.ok(response);
-
     }
 
-//    // ✅ 주문 수정 (PUT) - DTO 활용
+    //    // ✅ 주문 수정 (PUT) - DTO 활용
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_STAFF')")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @Valid @RequestBody OrderRequestDTO orderRequestDTO) {
