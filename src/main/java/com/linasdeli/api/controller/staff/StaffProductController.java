@@ -30,10 +30,10 @@ public class StaffProductController {
     }
 
     // ✅ 상품 수정
-//    @PutMapping("/{id}")
-//    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Integer id, @Valid @RequestBody ProductRequestDTO dto) {
-//        return ResponseEntity.ok(productService.updateProduct(id, dto));
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Integer id, @Valid @RequestBody ProductRequestDTO dto) {
+        return ResponseEntity.ok(productService.updateProduct(id, dto));
+    }
 
     // ✅ 전체 상품 목록 조회 (리스트 뷰용)
     @GetMapping
@@ -47,8 +47,8 @@ public class StaffProductController {
     }
 
     // ✅ 수정용 폼 데이터 조회 (폼에 pre-fill용)
-//    @GetMapping("/{id}")
-//    public ResponseEntity<ProductFormResponseDTO> getProductForm(@PathVariable Integer id) {
-//        return ResponseEntity.ok(productService.getProductForm(id));
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductFormResponseDTO> getProductForm(@PathVariable Integer id) {
+        return ResponseEntity.ok(productService.getProductForm(id));
+    }
 }
