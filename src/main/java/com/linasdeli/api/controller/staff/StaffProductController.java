@@ -73,4 +73,10 @@ public class StaffProductController {
         return ResponseEntity.ok(productService.getAllOrigins());
     }
 
+    @PatchMapping("/{id}/instock")
+    //@PreAuthorize("hasAuthority('ROLE_STAFF')")
+    public ResponseEntity<Void> updateInStock(@PathVariable Integer id, @RequestParam boolean inStock) {
+        productService.updateInStock(id, inStock);
+        return ResponseEntity.ok().build();
+    }
 }
