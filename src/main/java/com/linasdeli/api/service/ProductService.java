@@ -285,4 +285,15 @@ public class ProductService {
         return dto;
     }
 
+    public List<Supplier> getAllSuppliers() {
+        return supplierRepository.findAll();
+    }
+
+    public List<Animal> getAllAnimals() {
+        return animalRepository.findAll();
+    }
+
+    public List<Country> getAllOrigins() {
+        return countryRepository.findAll();
+    }
 }
