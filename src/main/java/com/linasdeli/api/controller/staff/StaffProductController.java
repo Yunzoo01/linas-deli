@@ -1,4 +1,4 @@
-package com.linasdeli.api.controller;
+package com.linasdeli.api.controller.staff;
 
 import com.linasdeli.api.dto.CategoryCountDTO;
 import com.linasdeli.api.dto.ProductDTO;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/staff/products")
 @RequiredArgsConstructor
 public class StaffProductController {
 

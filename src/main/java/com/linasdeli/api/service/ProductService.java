@@ -6,6 +6,8 @@ import com.linasdeli.api.dto.CategoryCountDTO;
 import com.linasdeli.api.dto.ProductListItemDTO;
 import com.linasdeli.api.dto.request.ProductRequestDTO;
 import com.linasdeli.api.dto.ProductDTO;
+import com.linasdeli.api.dto.response.CustomerProductDTO;
+import com.linasdeli.api.dto.response.CustomerProductListDTO;
 import com.linasdeli.api.dto.response.ProductFormResponseDTO;
 import com.linasdeli.api.dto.response.ProductResponseDTO;
 import com.linasdeli.api.repository.*;
@@ -236,5 +238,51 @@ public class ProductService {
         return dto;
     }
 
+    public List<CustomerProductListDTO> getCustomerProductList() {
+        List<Product> products = productRepository.findAll();
+
+        return products.stream().map(product -> {
+            CustomerProductListDTO dto = new CustomerProductListDTO();
+            dto.setPid(product.getPid());
+            dto.setProductImageName(product.getImageName());
+            dto.setProductImageUrl(product.getImageUrl());
+            dto.setProductName(product.getProductName());
+            dto.setOriginName(
+                    product.getProductDetails() != null && !product.getProductDetails().isEmpty()
+                            ? product.getProductDetails().get(0).getCountry().getCountryName()
+                            : null
+            );
+            dto.setCategoryName(product.getCategory().getCategoryName());
+            dto.setAnimalName(
+                    product.getProductDetails() != null && !product.getProductDetails().isEmpty()
+                            ? product.getProductDetails().get(0).getAnimal().getAnimalName()
+                            : null
+            );
+            dto.setPasteurized(product.getPasteurized());
+            dto.setAllergies(product.getAllergies());
+            return dto;
+        }).toList();
+    }
+
+    public CustomerProductDTO getCustomerProductDetail(Integer id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        CustomerProductDTO dto = new CustomerProductDTO();
+        dto.setPid(product.getPid());
+        dto.setProductName(product.getProductName());
+        dto.setOriginName(
+                product.getProductDetails() != null && !product.getProductDetails().isEmpty()
+                        ? product.getProductDetails().get(0).getCountry().getCountryName()
+                        : null
+        );
+        dto.setAllergies(product.getAllergies());
+        dto.setDescription(product.getDescription());
+        dto.setPasteurized(product.getPasteurized());
+        dto.setServingSuggestion(product.getServingSuggestion());
+        dto.setIngredientsImageName(product.getIngredientsImageName());
+        dto.setIngredientsImageUrl(product.getIngredientsImageUrl());
+        return dto;
+    }
 
 }
