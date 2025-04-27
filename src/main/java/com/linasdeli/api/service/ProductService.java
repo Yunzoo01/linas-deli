@@ -238,50 +238,50 @@ public class ProductService {
         return dto;
     }
 
-    public List<CustomerProductListDTO> getCustomerProductList() {
-        List<Product> products = productRepository.findAll();
+    // ✅ Customer - 상품 전체 조회 (카테고리+검색)
+    public Page<CustomerProductListDTO> getProductsForCustomer(Pageable pageable, String category, String keyword) {
+        Page<Product> products;
 
-        return products.stream().map(product -> {
+        if ((keyword == null || keyword.isEmpty()) && (category == null || category.isEmpty() || category.equalsIgnoreCase("All"))) {
+            products = productRepository.findAll(pageable);
+        } else if (category == null || category.isEmpty()) {
+            products = productRepository.findByProductNameContainingIgnoreCase(keyword, pageable);
+        } else if (keyword == null || keyword.isEmpty()) {
+            products = productRepository.findByCategory_CategoryNameIgnoreCase(category, pageable);
+        } else {
+            products = productRepository.findByProductNameContainingIgnoreCaseAndCategory_CategoryNameIgnoreCase(keyword, category, pageable);
+        }
+
+        return products.map(product -> {
             CustomerProductListDTO dto = new CustomerProductListDTO();
             dto.setPid(product.getPid());
             dto.setProductImageName(product.getImageName());
             dto.setProductImageUrl(product.getImageUrl());
             dto.setProductName(product.getProductName());
-            dto.setOriginName(
-                    product.getProductDetails() != null && !product.getProductDetails().isEmpty()
-                            ? product.getProductDetails().get(0).getCountry().getCountryName()
-                            : null
-            );
+            dto.setOriginName(product.getProductDetails().isEmpty() ? null : product.getProductDetails().get(0).getCountry().getCountryName());
             dto.setCategoryName(product.getCategory().getCategoryName());
-            dto.setAnimalName(
-                    product.getProductDetails() != null && !product.getProductDetails().isEmpty()
-                            ? product.getProductDetails().get(0).getAnimal().getAnimalName()
-                            : null
-            );
+            dto.setAnimalName(product.getProductDetails().isEmpty() ? null : product.getProductDetails().get(0).getAnimal().getAnimalName());
             dto.setPasteurized(product.getPasteurized());
             dto.setAllergies(product.getAllergies());
             return dto;
-        }).toList();
+        });
     }
 
+    // ✅ Customer - 상품 상세 조회 (id 기준)
     public CustomerProductDTO getCustomerProductDetail(Integer id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         CustomerProductDTO dto = new CustomerProductDTO();
-        dto.setPid(product.getPid());
         dto.setProductName(product.getProductName());
-        dto.setOriginName(
-                product.getProductDetails() != null && !product.getProductDetails().isEmpty()
-                        ? product.getProductDetails().get(0).getCountry().getCountryName()
-                        : null
-        );
+        dto.setOriginName(product.getProductDetails().isEmpty() ? null : product.getProductDetails().get(0).getCountry().getCountryName());
         dto.setAllergies(product.getAllergies());
         dto.setDescription(product.getDescription());
         dto.setPasteurized(product.getPasteurized());
         dto.setServingSuggestion(product.getServingSuggestion());
         dto.setIngredientsImageName(product.getIngredientsImageName());
         dto.setIngredientsImageUrl(product.getIngredientsImageUrl());
+
         return dto;
     }
 
