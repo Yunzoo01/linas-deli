@@ -14,6 +14,7 @@ import com.linasdeli.api.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.data.domain.Page;
@@ -126,28 +127,6 @@ public class ProductService {
         });
     }
 
-    public List<ProductListItemDTO> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-
-        return products.stream().map(product -> {
-            ProductListItemDTO dto = new ProductListItemDTO();
-            dto.setPid(product.getPid());
-            dto.setProductName(product.getProductName());
-            dto.setProductImageName(product.getImageName());
-            dto.setProductImageUrl(product.getImageUrl());
-            dto.setInStock(product.isInStock());
-
-            List<Cost> costs = costRepository.findByProduct(product);
-            if (!costs.isEmpty()) {
-                Cost cost = costs.get(0);
-                dto.setPlu(cost.getPlu() != null ? String.valueOf(cost.getPlu()) : null);
-            } else {
-                dto.setPlu(null);
-            }
-
-            return dto;
-        }).toList();
-    }
     public ProductResponseDTO getProductsWithCategoryCounts(Pageable pageable, String keyword, String category) {
         Page<ProductDTO> productPage = getProducts(pageable, keyword, category);
         List<CategoryCountDTO> categoryCounts = productRepository.countProductsByCategory();
@@ -285,4 +264,26 @@ public class ProductService {
         return dto;
     }
 
+    public List<Supplier> getAllSuppliers() {
+        return supplierRepository.findAll();
+    }
+
+    public List<Animal> getAllAnimals() {
+        return animalRepository.findAll();
+    }
+
+    public List<Country> getAllOrigins() {
+        return countryRepository.findAll();
+    }
+
+    @Transactional
+    public void updateInStock(Integer productId, boolean inStock) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        product.setInStock(inStock);
+        product.setUpdatedAt(LocalDateTime.now()); // 수정시간 업데이트 (optional)
+
+        productRepository.save(product);
+    }
 }

@@ -1,5 +1,8 @@
 package com.linasdeli.api.controller.staff;
 
+import com.linasdeli.api.domain.Animal;
+import com.linasdeli.api.domain.Country;
+import com.linasdeli.api.domain.Supplier;
 import com.linasdeli.api.dto.CategoryCountDTO;
 import com.linasdeli.api.dto.ProductDTO;
 import com.linasdeli.api.dto.response.ProductFormResponseDTO;
@@ -50,5 +53,30 @@ public class StaffProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductFormResponseDTO> getProductForm(@PathVariable Integer id) {
         return ResponseEntity.ok(productService.getProductForm(id));
+    }
+
+    // ✅ 전체 Supplier 목록 가져오기
+    @GetMapping("/suppliers")
+    public ResponseEntity<List<Supplier>> getAllSuppliers() {
+        return ResponseEntity.ok(productService.getAllSuppliers());
+    }
+
+    // ✅ 전체 Animal 목록 가져오기
+    @GetMapping("/animals")
+    public ResponseEntity<List<Animal>> getAllAnimals() {
+        return ResponseEntity.ok(productService.getAllAnimals());
+    }
+
+    // ✅ 전체 Origin (Country) 목록 가져오기
+    @GetMapping("/origins")
+    public ResponseEntity<List<Country>> getAllOrigins() {
+        return ResponseEntity.ok(productService.getAllOrigins());
+    }
+
+    @PatchMapping("/{id}/instock")
+    //@PreAuthorize("hasAuthority('ROLE_STAFF')")
+    public ResponseEntity<Void> updateInStock(@PathVariable Integer id, @RequestParam boolean inStock) {
+        productService.updateInStock(id, inStock);
+        return ResponseEntity.ok().build();
     }
 }

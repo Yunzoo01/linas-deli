@@ -56,10 +56,17 @@ public class ProductDTO {
         this.categoryId = product.getCategory().getCategoryId();
         this.categoryName = product.getCategory().getCategoryName();
 
-        this.priceType = cost.getPriceType().name();
-        this.supplierPrice = cost.getSupplierPrice().doubleValue();
-        this.retailPrice = cost.getRetailPrice().doubleValue();
-        this.plu = cost.getPlu();
+        if (cost != null) {
+            this.priceType = cost.getPriceType().name();
+            this.supplierPrice = cost.getSupplierPrice().doubleValue();
+            this.retailPrice = cost.getRetailPrice().doubleValue();
+            this.plu = cost.getPlu();
+        } else {
+            this.priceType = null;
+            this.supplierPrice = null;
+            this.retailPrice = null;
+            this.plu = null;
+        }
 
         if (product.getProductDetails() != null && !product.getProductDetails().isEmpty()) {
             this.animalId = product.getProductDetails().get(0).getAnimal().getAnimalId();
