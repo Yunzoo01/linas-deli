@@ -14,9 +14,9 @@ public class ProductFormResponseDTO {
     private String productName;
     private Integer supplierId;
     private String priceType;
-    private Double cost;
+    private Double supplierPrice;
     private Double salePrice;
-    private String plu;
+    private Integer plu;
 
     private Integer animalId;
     private Boolean pasteurized;

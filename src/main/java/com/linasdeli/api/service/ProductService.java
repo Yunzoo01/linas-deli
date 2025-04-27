@@ -6,6 +6,9 @@ import com.linasdeli.api.dto.CategoryCountDTO;
 import com.linasdeli.api.dto.ProductListItemDTO;
 import com.linasdeli.api.dto.request.ProductRequestDTO;
 import com.linasdeli.api.dto.ProductDTO;
+import com.linasdeli.api.dto.response.CustomerProductDTO;
+import com.linasdeli.api.dto.response.CustomerProductListDTO;
+import com.linasdeli.api.dto.response.ProductFormResponseDTO;
 import com.linasdeli.api.dto.response.ProductResponseDTO;
 import com.linasdeli.api.repository.*;
 import lombok.extern.slf4j.Slf4j;
@@ -150,4 +153,136 @@ public class ProductService {
         List<CategoryCountDTO> categoryCounts = productRepository.countProductsByCategory();
         return new ProductResponseDTO(productPage, categoryCounts);
     }
+
+    public ProductDTO updateProduct(Integer id, ProductRequestDTO dto) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+
+        // product 수정
+        product.setProductName(dto.getProductName());
+        product.setSupplier(supplierRepository.findById(dto.getSupplierId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid supplier ID")));
+        product.setCategory(categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID")));
+        product.setAllergies(dto.getAllergies());
+        product.setPasteurized(dto.getPasteurized());
+        product.setImageName(dto.getProductImageName());
+        product.setImageUrl(dto.getProductImageUrl());
+        product.setIngredientsImageName(dto.getIngredientsImageName());
+        product.setIngredientsImageUrl(dto.getIngredientsImageUrl());
+        product.setDescription(dto.getDescription());
+        product.setServingSuggestion(dto.getSuggestion());
+        product.setUpdatedAt(LocalDateTime.now());
+
+        // Detail 수정
+        if (product.getProductDetails() != null && !product.getProductDetails().isEmpty()) {
+            ProductDetail detail = product.getProductDetails().get(0);
+            detail.setAnimal(animalRepository.findById(dto.getAnimalId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid animal ID")));
+            detail.setCountry(countryRepository.findById(dto.getOriginId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid country ID")));
+        }
+
+        // 저장
+        Product updatedProduct = productRepository.save(product);
+
+        // Cost 수정
+        Cost cost = costRepository.findByProduct(product)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No cost info for this product"));
+
+        cost.setPriceType(dto.getPriceType());
+        cost.setSupplierPrice(BigDecimal.valueOf(dto.getSupplierPrice()));
+        cost.setRetailPrice(BigDecimal.valueOf(dto.getSalePrice()));
+        cost.setPlu(dto.getPlu());
+
+        costRepository.save(cost);
+
+        return new ProductDTO(updatedProduct, cost);
+    }
+
+    public ProductFormResponseDTO getProductForm(Integer id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+
+        Cost cost = costRepository.findByProduct(product)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No cost info for this product"));
+
+        ProductFormResponseDTO dto = new ProductFormResponseDTO();
+        dto.setPid(product.getPid());
+        dto.setCategoryId(product.getCategory().getCategoryId());
+        dto.setProductName(product.getProductName());
+        dto.setSupplierId(product.getSupplier().getSid());
+        dto.setPriceType(cost.getPriceType().name());
+        dto.setSupplierPrice(cost.getSupplierPrice().doubleValue());
+        dto.setSalePrice(cost.getRetailPrice().doubleValue());
+        dto.setPlu(cost.getPlu());
+
+        if (product.getProductDetails() != null && !product.getProductDetails().isEmpty()) {
+            dto.setAnimalId(product.getProductDetails().get(0).getAnimal().getAnimalId());
+            dto.setOriginId(product.getProductDetails().get(0).getCountry().getCountryId());
+        }
+
+        dto.setPasteurized(product.getPasteurized());
+        dto.setAllergies(product.getAllergies());
+        dto.setProductImageName(product.getImageName());
+        dto.setProductImageUrl(product.getImageUrl());
+        dto.setIngredientsImageName(product.getIngredientsImageName());
+        dto.setIngredientsImageUrl(product.getIngredientsImageUrl());
+        dto.setDescription(product.getDescription());
+        dto.setSuggestion(product.getServingSuggestion());
+
+        return dto;
+    }
+
+    public List<CustomerProductListDTO> getCustomerProductList() {
+        List<Product> products = productRepository.findAll();
+
+        return products.stream().map(product -> {
+            CustomerProductListDTO dto = new CustomerProductListDTO();
+            dto.setPid(product.getPid());
+            dto.setProductImageName(product.getImageName());
+            dto.setProductImageUrl(product.getImageUrl());
+            dto.setProductName(product.getProductName());
+            dto.setOriginName(
+                    product.getProductDetails() != null && !product.getProductDetails().isEmpty()
+                            ? product.getProductDetails().get(0).getCountry().getCountryName()
+                            : null
+            );
+            dto.setCategoryName(product.getCategory().getCategoryName());
+            dto.setAnimalName(
+                    product.getProductDetails() != null && !product.getProductDetails().isEmpty()
+                            ? product.getProductDetails().get(0).getAnimal().getAnimalName()
+                            : null
+            );
+            dto.setPasteurized(product.getPasteurized());
+            dto.setAllergies(product.getAllergies());
+            return dto;
+        }).toList();
+    }
+
+    public CustomerProductDTO getCustomerProductDetail(Integer id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        CustomerProductDTO dto = new CustomerProductDTO();
+        dto.setPid(product.getPid());
+        dto.setProductName(product.getProductName());
+        dto.setOriginName(
+                product.getProductDetails() != null && !product.getProductDetails().isEmpty()
+                        ? product.getProductDetails().get(0).getCountry().getCountryName()
+                        : null
+        );
+        dto.setAllergies(product.getAllergies());
+        dto.setDescription(product.getDescription());
+        dto.setPasteurized(product.getPasteurized());
+        dto.setServingSuggestion(product.getServingSuggestion());
+        dto.setIngredientsImageName(product.getIngredientsImageName());
+        dto.setIngredientsImageUrl(product.getIngredientsImageUrl());
+        return dto;
+    }
+
 }
