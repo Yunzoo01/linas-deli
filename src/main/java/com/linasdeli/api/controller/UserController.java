@@ -1,5 +1,7 @@
 package com.linasdeli.api.controller;
 
+import com.linasdeli.api.dto.request.PasswordChangedRequestDTO;
+import com.linasdeli.api.service.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -9,9 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,5 +96,20 @@ public class UserController {
             log.error("Login failed for user {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
+    }
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    @PutMapping("/change-password")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_STAFF')")
+    public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
+                                            @RequestBody PasswordChangedRequestDTO request) {
+        userDetailsService.changePassword(
+                userDetails.getUsername(),
+                request.getCurrentPassword(),
+                request.getNewPassword()
+        );
+        return ResponseEntity.ok("Password changed successfully");
     }
 }

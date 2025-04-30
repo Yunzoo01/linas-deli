@@ -1,6 +1,7 @@
 package com.linasdeli.api.controller.staff;
 
 import com.linasdeli.api.domain.Promotion;
+import com.linasdeli.api.dto.request.PromotionUpdateRequestDTO;
 import com.linasdeli.api.service.PromotionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,21 +75,15 @@ public class StaffPromotionController {
     @PreAuthorize("hasAuthority('ROLE_STAFF')")
     public ResponseEntity<Promotion> updatePromotion(
             @PathVariable Long id,
-            @RequestParam(value = "promotionTitle", required = false) String promotionTitle,
-            @RequestParam(value = "startDate", required = false) String startDate,
-            @RequestParam(value = "endDate", required = false) String endDate,
-            @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
+            @ModelAttribute PromotionUpdateRequestDTO request) throws IOException {
 
-        LocalDateTime start = (startDate != null) ? LocalDate.parse(startDate).atStartOfDay() : null;
-        LocalDateTime end = (endDate != null) ? LocalDate.parse(endDate).atTime(23, 59, 59) : null;
-
-        Promotion promotion = promotionService.updatePromotion(id, promotionTitle, start, end, image);
+        Promotion promotion = promotionService.updatePromotion(id, request);
         return new ResponseEntity<>(promotion, HttpStatus.OK);
     }
 
     // ✅ 프로모션 삭제
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_STAFF')")
+    //@PreAuthorize("hasAuthority('ROLE_STAFF')")
     public ResponseEntity<Void> deletePromotion(@PathVariable Long id) {
         promotionService.deletePromotion(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

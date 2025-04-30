@@ -1,6 +1,7 @@
 package com.linasdeli.api.service;
 
 import com.linasdeli.api.domain.Promotion;
+import com.linasdeli.api.dto.request.PromotionUpdateRequestDTO;
 import com.linasdeli.api.repository.PromotionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -106,29 +108,33 @@ public class PromotionService {
                 .orElseThrow(() -> new EntityNotFoundException("Promotion not found with id: " + promotionId));
     }
 
-    public Promotion updatePromotion(Long promotionId, String promotionTitle, LocalDateTime startDate, LocalDateTime endDate, MultipartFile image) throws IOException {
+    public Promotion updatePromotion(Long promotionId, PromotionUpdateRequestDTO request) throws IOException {
         Promotion promotion = promotionRepository.findById(promotionId)
                 .orElseThrow(() -> new EntityNotFoundException("Promotion with id " + promotionId + " not found"));
 
+
         // 제목 변경
-        if (promotionTitle != null && !promotionTitle.trim().isEmpty()) {
-            promotion.setPromotionTitle(promotionTitle);
+        if (request.getPromotionTitle() != null && !request.getPromotionTitle().trim().isEmpty()) {
+            promotion.setPromotionTitle(request.getPromotionTitle());
         }
 
         // 날짜 변경
-        if (startDate != null) {
-            promotion.setStartDate(startDate);
+        if (request.getStartDate() != null) {
+            promotion.setStartDate(LocalDate.parse(request.getStartDate()).atStartOfDay());
         }
-        if (endDate != null) {
-            promotion.setEndDate(endDate);
+        if (request.getEndDate() != null) {
+            promotion.setEndDate(LocalDate.parse(request.getEndDate()).atTime(23, 59, 59));
         }
 
         // 이미지 변경
-        if (image != null && !image.isEmpty()) {
-            String fileName = storeImage(image);
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            String fileName = storeImage(request.getImage());
+            promotion.setPromotionImageUrl("/upload/" + fileName);
             promotion.setPromotionImageName(fileName);
-            promotion.setPromotionImageUrl(serverDomain + "/upload/" + fileName);
         }
+
+        // 수정 시간 업데이트
+        promotion.setUpdatedAt(LocalDateTime.now());
 
         return promotionRepository.save(promotion);
     }
