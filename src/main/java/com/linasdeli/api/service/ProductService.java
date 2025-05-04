@@ -276,6 +276,10 @@ public class ProductService {
         return countryRepository.findAll();
     }
 
+    public List<Category> getAllCategories(){
+        return categoryRepository.findAll();
+    }
+
     @Transactional
     public void updateInStock(Integer productId, boolean inStock) {
         Product product = productRepository.findById(productId)
@@ -286,4 +290,5 @@ public class ProductService {
 
         productRepository.save(product);
     }
+
 }
