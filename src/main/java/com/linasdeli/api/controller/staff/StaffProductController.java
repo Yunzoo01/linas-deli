@@ -1,6 +1,7 @@
 package com.linasdeli.api.controller.staff;
 
 import com.linasdeli.api.domain.Animal;
+import com.linasdeli.api.domain.Category;
 import com.linasdeli.api.domain.Country;
 import com.linasdeli.api.domain.Supplier;
 import com.linasdeli.api.dto.CategoryCountDTO;
@@ -71,6 +72,11 @@ public class StaffProductController {
     @GetMapping("/origins")
     public ResponseEntity<List<Country>> getAllOrigins() {
         return ResponseEntity.ok(productService.getAllOrigins());
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<Category>> getAllCategories(){
+        return ResponseEntity.ok(productService.getAllCategories());
     }
 
     @PatchMapping("/{id}/instock")
