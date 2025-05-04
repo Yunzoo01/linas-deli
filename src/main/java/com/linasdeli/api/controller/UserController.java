@@ -1,6 +1,8 @@
 package com.linasdeli.api.controller;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,37 +62,38 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String id, @RequestParam String password, HttpServletRequest request) {
+    public ResponseEntity<?> login(@RequestParam String id, @RequestParam String password, HttpServletRequest request, HttpServletResponse response) {
         try {
-            // Authenticate the user using the AuthenticationManager
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(id, password)
             );
-
-            // Store the Authentication object in SecurityContext
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Get the user details from the authentication object
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            HttpSession session = request.getSession(true);
 
-            // Create a session
-            HttpSession session = request.getSession(true);  // Creates a new session if none exists
-            // Spring Security will automatically save the security context in the session
+            // 세션 쿠키를 클라이언트로 전달
+            Cookie cookie = new Cookie("JSESSIONID", session.getId());
+            cookie.setPath("/");
+            cookie.setHttpOnly(true);  // 보안 강화를 위해 HttpOnly 설정
+            cookie.setMaxAge(60 * 60);  // 1시간 동안 유효
 
-            // Prepare the response
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Login successful");
-            response.put("user", Map.of(
-                    "id", userDetails.getUsername(), // Use UserDetails for ID/username
+            response.addCookie(cookie);
+
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("message", "Login successful");
+            responseMap.put("user", Map.of(
+                    "id", userDetails.getUsername(),
                     "username", userDetails.getUsername(),
                     "sessionId", session.getId(),
-                    "role", userDetails.getAuthorities().iterator().next().getAuthority() // Get the role from authorities
+                    "role", userDetails.getAuthorities().iterator().next().getAuthority()
             ));
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(responseMap);
         } catch (Exception e) {
             log.error("Login failed for user {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
+
 }

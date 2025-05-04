@@ -127,7 +127,7 @@ public class PromotionService {
         if (image != null && !image.isEmpty()) {
             String fileName = storeImage(image);
             promotion.setPromotionImageName(fileName);
-            promotion.setPromotionImageUrl(serverDomain + "/upload/" + fileName);
+            promotion.setPromotionImageUrl("/upload/" + fileName);
         }
 
         return promotionRepository.save(promotion);
