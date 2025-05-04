@@ -93,7 +93,7 @@ public class OrderService {
     public OrderDTO updateOrder(Long id, OrderRequestDTO orderRequestDTO) {
         return orderRepository.findById(id)
                 .map(order -> {
-                    Platter platterEntity = platterRepository.findByPlatterName(orderRequestDTO.getPlatterName() + " BOX")
+                    Platter platterEntity = platterRepository.findByPlatterName(orderRequestDTO.getPlatterName())
                             .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 플래터입니다.: " + orderRequestDTO.getPlatterName()));
                     order.setPlatter(platterEntity);
                     order.setCustomerName(orderRequestDTO.getCustomerName());
