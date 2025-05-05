@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,14 +30,24 @@ public class StaffProductController {
 
     // ✅ 상품 추가
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductRequestDTO dto) {
-        return ResponseEntity.ok(productService.createProduct(dto));
+    public ResponseEntity<ProductDTO> createProduct(
+            @ModelAttribute ProductRequestDTO dto,
+            @RequestParam(required = false) MultipartFile productImage,
+            @RequestParam(required = false) MultipartFile ingredientsImage) {
+
+        ProductDTO created = productService.createProduct(dto, productImage, ingredientsImage);
+        return ResponseEntity.ok(created);
     }
 
     // ✅ 상품 수정
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Integer id, @Valid @RequestBody ProductRequestDTO dto) {
-        return ResponseEntity.ok(productService.updateProduct(id, dto));
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<ProductDTO> updateProduct(
+            @PathVariable Integer id,
+            @ModelAttribute ProductRequestDTO dto, // ✔️ @RequestPart 아님!
+            @RequestPart(required = false) MultipartFile productImage,
+            @RequestPart(required = false) MultipartFile ingredientsImage
+    ) {
+        return ResponseEntity.ok(productService.updateProduct(id, dto, productImage, ingredientsImage));
     }
 
     // ✅ 전체 상품 목록 조회 (리스트 뷰용)

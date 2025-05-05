@@ -11,10 +11,14 @@ import com.linasdeli.api.dto.response.CustomerProductListDTO;
 import com.linasdeli.api.dto.response.ProductFormResponseDTO;
 import com.linasdeli.api.dto.response.ProductResponseDTO;
 import com.linasdeli.api.repository.*;
+import com.linasdeli.api.util.FileUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.data.domain.Page;
@@ -35,6 +39,8 @@ public class ProductService {
     private final CountryRepository countryRepository;
     private final CostRepository costRepository;
     private final ModelMapper modelMapper;
+    private final FileUtil fileUtil;
+
 
     public ProductService(ProductRepository productRepository,
                           SupplierRepository supplierRepository,
@@ -42,7 +48,7 @@ public class ProductService {
                           AnimalRepository animalRepository,
                           CountryRepository countryRepository,
                           CostRepository costRepository,
-                          ModelMapper modelMapper) {
+                          ModelMapper modelMapper, FileUtil fileUtil) {
         this.productRepository = productRepository;
         this.supplierRepository = supplierRepository;
         this.categoryRepository = categoryRepository;
@@ -50,63 +56,63 @@ public class ProductService {
         this.countryRepository = countryRepository;
         this.costRepository = costRepository;
         this.modelMapper = modelMapper;
+        this.fileUtil = fileUtil;
     }
 
-    public ProductDTO createProduct(ProductRequestDTO dto) {
-        // 🔸 연관 엔티티 조회
-        Supplier supplier = supplierRepository.findById(dto.getSupplierId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid supplier ID"));
+    public ProductDTO createProduct(ProductRequestDTO dto, MultipartFile productImage, MultipartFile ingredientsImage) {
 
-        Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID"));
+        // 엔티티들 조회
+        Supplier supplier = supplierRepository.findById(dto.getSupplierId()).orElseThrow();
+        Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
+        Animal animal = animalRepository.findById(dto.getAnimalId()).orElseThrow();
+        Country country = countryRepository.findById(dto.getOriginId()).orElseThrow();
 
-        Animal animal = animalRepository.findById(dto.getAnimalId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid animal ID"));
-
-        Country country = countryRepository.findById(dto.getOriginId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid origin ID"));
-
-        // 🔸 Product 생성
         Product product = new Product();
         product.setProductName(dto.getProductName());
         product.setSupplier(supplier);
         product.setCategory(category);
         product.setAllergies(dto.getAllergies());
         product.setPasteurized(dto.getPasteurized());
-        product.setImageName(dto.getProductImageName());
-        product.setImageUrl(dto.getProductImageUrl());
-        product.setIngredientsImageName(dto.getIngredientsImageName());
-        product.setIngredientsImageUrl(dto.getIngredientsImageUrl());
         product.setDescription(dto.getDescription());
         product.setServingSuggestion(dto.getSuggestion());
         product.setInStock(true);
         product.setCreatedAt(LocalDateTime.now());
         product.setUpdatedAt(LocalDateTime.now());
 
-        // 🔸 ProductDetail 생성
+        // ✅ 이미지 저장 (파일명 + URL)
+        if (productImage != null && !productImage.isEmpty()) {
+            FileUtil.UploadResult result = fileUtil.saveImage(productImage, "product");
+            product.setImageUrl(result.getUrl());
+            product.setImageName(result.getFileName());
+        }
+
+        if (ingredientsImage != null && !ingredientsImage.isEmpty()) {
+            FileUtil.UploadResult result = fileUtil.saveImage(ingredientsImage, "ingredients");
+            product.setIngredientsImageUrl(result.getUrl());
+            product.setIngredientsImageName(result.getFileName());
+        }
+
+        // ProductDetail
         ProductDetail detail = new ProductDetail();
         detail.setProduct(product);
         detail.setAnimal(animal);
         detail.setCountry(country);
         product.setProductDetails(List.of(detail));
 
-        // 🔸 저장 (먼저 Product)
+        // 저장
         Product savedProduct = productRepository.save(product);
 
-        // 🔸 Cost 생성 및 저장
         Cost cost = new Cost();
         cost.setProduct(savedProduct);
         cost.setPriceType(dto.getPriceType());
         cost.setSupplierPrice(BigDecimal.valueOf(dto.getSupplierPrice()));
         cost.setRetailPrice(BigDecimal.valueOf(dto.getSalePrice()));
         cost.setPlu(dto.getPlu());
-
         Cost savedCost = costRepository.save(cost);
 
-        // ✅ 최종 응답 DTO로 반환
-        log.info("Product created: {}", savedProduct.getProductName());
         return new ProductDTO(savedProduct, savedCost);
     }
+
 
     public Page<ProductDTO> getProducts(Pageable pageable, String keyword, String category) {
         Page<Product> products;
@@ -133,43 +139,43 @@ public class ProductService {
         return new ProductResponseDTO(productPage, categoryCounts);
     }
 
-    public ProductDTO updateProduct(Integer id, ProductRequestDTO dto) {
+    public ProductDTO updateProduct(Integer id, ProductRequestDTO dto, MultipartFile productImage, MultipartFile ingredientsImage) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
 
-        // product 수정
+        // 이미지 새로 업로드했을 경우 처리
+        if (productImage != null && !productImage.isEmpty()) {
+            FileUtil.UploadResult result = fileUtil.saveImage(productImage, "product");
+            product.setImageUrl(result.getUrl());
+            product.setImageName(result.getFileName());
+        }
+
+        if (ingredientsImage != null && !ingredientsImage.isEmpty()) {
+            FileUtil.UploadResult result = fileUtil.saveImage(ingredientsImage, "ingredients");
+            product.setIngredientsImageUrl(result.getUrl());
+            product.setIngredientsImageName(result.getFileName());
+        }
+
+        // 나머지 수정 처리
         product.setProductName(dto.getProductName());
-        product.setSupplier(supplierRepository.findById(dto.getSupplierId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid supplier ID")));
-        product.setCategory(categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID")));
+        product.setSupplier(supplierRepository.findById(dto.getSupplierId()).orElseThrow());
+        product.setCategory(categoryRepository.findById(dto.getCategoryId()).orElseThrow());
         product.setAllergies(dto.getAllergies());
         product.setPasteurized(dto.getPasteurized());
-        product.setImageName(dto.getProductImageName());
-        product.setImageUrl(dto.getProductImageUrl());
-        product.setIngredientsImageName(dto.getIngredientsImageName());
-        product.setIngredientsImageUrl(dto.getIngredientsImageUrl());
         product.setDescription(dto.getDescription());
         product.setServingSuggestion(dto.getSuggestion());
         product.setUpdatedAt(LocalDateTime.now());
 
-        // Detail 수정
-        if (product.getProductDetails() != null && !product.getProductDetails().isEmpty()) {
+        if (!product.getProductDetails().isEmpty()) {
             ProductDetail detail = product.getProductDetails().get(0);
-            detail.setAnimal(animalRepository.findById(dto.getAnimalId())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid animal ID")));
-            detail.setCountry(countryRepository.findById(dto.getOriginId())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid country ID")));
+            detail.setAnimal(animalRepository.findById(dto.getAnimalId()).orElseThrow());
+            detail.setCountry(countryRepository.findById(dto.getOriginId()).orElseThrow());
         }
 
-        // 저장
-        Product updatedProduct = productRepository.save(product);
+        productRepository.save(product);
 
-        // Cost 수정
-        Cost cost = costRepository.findByProduct(product)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No cost info for this product"));
+        Cost cost = costRepository.findByProduct(product).stream().findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No cost info"));
 
         cost.setPriceType(dto.getPriceType());
         cost.setSupplierPrice(BigDecimal.valueOf(dto.getSupplierPrice()));
@@ -178,7 +184,7 @@ public class ProductService {
 
         costRepository.save(cost);
 
-        return new ProductDTO(updatedProduct, cost);
+        return new ProductDTO(product, cost);
     }
 
     public ProductFormResponseDTO getProductForm(Integer id) {
