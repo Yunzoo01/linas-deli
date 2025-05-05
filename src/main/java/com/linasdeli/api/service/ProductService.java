@@ -3,24 +3,19 @@ package com.linasdeli.api.service;
 import com.linasdeli.api.domain.*;
 import com.linasdeli.api.domain.enums.PriceType;
 import com.linasdeli.api.dto.CategoryCountDTO;
-import com.linasdeli.api.dto.ProductListItemDTO;
-import com.linasdeli.api.dto.request.ProductRequestDTO;
 import com.linasdeli.api.dto.ProductDTO;
+import com.linasdeli.api.dto.request.ProductRequestDTO;
 import com.linasdeli.api.dto.response.CustomerProductDTO;
 import com.linasdeli.api.dto.response.CustomerProductListDTO;
 import com.linasdeli.api.dto.response.ProductFormResponseDTO;
 import com.linasdeli.api.dto.response.ProductResponseDTO;
 import com.linasdeli.api.repository.*;
 import com.linasdeli.api.util.FileUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -114,18 +109,8 @@ public class ProductService {
     }
 
 
-    public Page<ProductDTO> getProducts(Pageable pageable, String keyword, String category) {
-        Page<Product> products;
-
-        if ((keyword == null || keyword.isEmpty()) && (category == null || category.isEmpty() || category.equalsIgnoreCase("All"))) {
-            products = productRepository.findAll(pageable);
-        } else if (category == null || category.isEmpty()) {
-            products = productRepository.findByProductNameContainingIgnoreCase(keyword, pageable);
-        } else if (keyword == null || keyword.isEmpty()) {
-            products = productRepository.findByCategory_CategoryNameIgnoreCase(category, pageable);
-        } else {
-            products = productRepository.findByProductNameContainingIgnoreCaseAndCategory_CategoryNameIgnoreCase(keyword, category, pageable);
-        }
+    public Page<ProductDTO> getProducts(Pageable pageable, String keyword, Integer categoryId) {
+        Page<Product> products = productRepository.findFilteredAndSorted(keyword, categoryId, pageable);
 
         return products.map(product -> {
             Cost cost = costRepository.findByProduct(product).stream().findFirst().orElse(null);
@@ -133,8 +118,8 @@ public class ProductService {
         });
     }
 
-    public ProductResponseDTO getProductsWithCategoryCounts(Pageable pageable, String keyword, String category) {
-        Page<ProductDTO> productPage = getProducts(pageable, keyword, category);
+    public ProductResponseDTO getProductsWithCategoryCounts(Pageable pageable, String keyword, Integer categoryId) {
+        Page<ProductDTO> productPage = getProducts(pageable, keyword, categoryId);
         List<CategoryCountDTO> categoryCounts = productRepository.countProductsByCategory();
         return new ProductResponseDTO(productPage, categoryCounts);
     }
@@ -225,17 +210,7 @@ public class ProductService {
 
     // ✅ Customer - 상품 전체 조회 (카테고리+검색)
     public Page<CustomerProductListDTO> getProductsForCustomer(Pageable pageable, String category, String keyword) {
-        Page<Product> products;
-
-        if ((keyword == null || keyword.isEmpty()) && (category == null || category.isEmpty() || category.equalsIgnoreCase("All"))) {
-            products = productRepository.findAll(pageable);
-        } else if (category == null || category.isEmpty()) {
-            products = productRepository.findByProductNameContainingIgnoreCase(keyword, pageable);
-        } else if (keyword == null || keyword.isEmpty()) {
-            products = productRepository.findByCategory_CategoryNameIgnoreCase(category, pageable);
-        } else {
-            products = productRepository.findByProductNameContainingIgnoreCaseAndCategory_CategoryNameIgnoreCase(keyword, category, pageable);
-        }
+        Page<Product> products = productRepository.findForCustomerSorted(keyword, category, pageable);
 
         return products.map(product -> {
             CustomerProductListDTO dto = new CustomerProductListDTO();
@@ -292,7 +267,7 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         product.setInStock(inStock);
-        product.setUpdatedAt(LocalDateTime.now()); // 수정시간 업데이트 (optional)
+        product.setUpdatedAt(LocalDateTime.now());
 
         productRepository.save(product);
     }
