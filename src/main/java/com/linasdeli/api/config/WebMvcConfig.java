@@ -3,6 +3,7 @@ package com.linasdeli.api.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.format.FormatterRegistry;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -14,5 +15,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:uploads/");
     }
 
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new StringToAllergyTypeConverter());
+    }
 
 }

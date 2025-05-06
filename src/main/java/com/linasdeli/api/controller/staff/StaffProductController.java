@@ -56,9 +56,9 @@ public class StaffProductController {
     public ResponseEntity<ProductResponseDTO> getProducts(
             Pageable pageable,
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "category", required = false) String category
+            @RequestParam(value = "categoryId", required = false) Integer categoryId
     ) {
-        return ResponseEntity.ok(productService.getProductsWithCategoryCounts(pageable, keyword, category));
+        return ResponseEntity.ok(productService.getProductsWithCategoryCounts(pageable, keyword, categoryId));
     }
 
     // ✅ 수정용 폼 데이터 조회 (폼에 pre-fill용)
