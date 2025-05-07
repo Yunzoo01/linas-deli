@@ -1,27 +1,29 @@
 package com.linasdeli.api.service;
 
 import com.linasdeli.api.domain.*;
+import com.linasdeli.api.domain.enums.AllergyType;
 import com.linasdeli.api.domain.enums.PriceType;
 import com.linasdeli.api.dto.CategoryCountDTO;
 import com.linasdeli.api.dto.ProductDTO;
 import com.linasdeli.api.dto.request.ProductRequestDTO;
-import com.linasdeli.api.dto.response.CustomerProductDTO;
-import com.linasdeli.api.dto.response.CustomerProductListDTO;
-import com.linasdeli.api.dto.response.ProductFormResponseDTO;
-import com.linasdeli.api.dto.response.ProductResponseDTO;
+import com.linasdeli.api.dto.response.*;
 import com.linasdeli.api.repository.*;
 import com.linasdeli.api.util.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -55,7 +57,7 @@ public class ProductService {
     }
 
     public ProductDTO createProduct(ProductRequestDTO dto, MultipartFile productImage, MultipartFile ingredientsImage) {
-
+        log.info(String.valueOf(dto.getSupplierId()));
         // 엔티티들 조회
         Supplier supplier = supplierRepository.findById(dto.getSupplierId()).orElseThrow();
         Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
@@ -209,23 +211,27 @@ public class ProductService {
     }
 
     // ✅ Customer - 상품 전체 조회 (카테고리+검색)
-    public Page<CustomerProductListDTO> getProductsForCustomer(Pageable pageable, String category, String keyword) {
-        Page<Product> products = productRepository.findForCustomerSorted(keyword, category, pageable);
+    public Page<ProductWithDetailsDto> getProductsForCustomer(Pageable pageable, String category, String keyword) {
+        Pageable fixedPageable = PageRequest.of(pageable.getPageNumber(), 12);
+        Page<Product> products = productRepository.searchProducts(keyword, category, fixedPageable);
 
-        return products.map(product -> {
-            CustomerProductListDTO dto = new CustomerProductListDTO();
-            dto.setPid(product.getPid());
-            dto.setProductImageName(product.getImageName());
-            dto.setProductImageUrl(product.getImageUrl());
-            dto.setProductName(product.getProductName());
-            dto.setOriginName(product.getProductDetails().isEmpty() ? null : product.getProductDetails().get(0).getCountry().getCountryName());
-            dto.setCategoryName(product.getCategory().getCategoryName());
-            dto.setAnimalName(product.getProductDetails().isEmpty() ? null : product.getProductDetails().get(0).getAnimal().getAnimalName());
-            dto.setPasteurized(product.getPasteurized());
-            dto.setAllergies(product.getAllergies());
-            return dto;
-        });
+        Page<ProductWithDetailsDto> dtoPage = products.map(p -> new ProductWithDetailsDto(
+                p.getPid(),
+                p.getImageName(),
+                p.getImageUrl(),
+                p.getProductName(),
+                p.getDescription(),
+                p.getPasteurized(),
+                p.getIngredientsImageName(),
+                p.getIngredientsImageUrl(),
+                p.getCategory().getCategoryName(),
+                p.getProductDetails().isEmpty()? null : p.getProductDetails().get(0).getAnimal().getAnimalName(),
+                p.getAllergies(), // 여기가 핵심!
+                p.getProductDetails().isEmpty()? null : p.getProductDetails().get(0).getCountry().getCountryName()
+        ));
+        return dtoPage;
     }
+
 
     // ✅ Customer - 상품 상세 조회 (id 기준)
     public CustomerProductDTO getCustomerProductDetail(Integer id) {

@@ -2,6 +2,7 @@ package com.linasdeli.api.repository;
 
 import com.linasdeli.api.domain.Product;
 import com.linasdeli.api.dto.CategoryCountDTO;
+import com.linasdeli.api.dto.response.ProductWithDetailsDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,4 +32,19 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     Page<Product> findForCustomerSorted(@Param("keyword") String keyword,
                                         @Param("category") String category,
                                         Pageable pageable);
+
+    @Query("SELECT DISTINCT p FROM Product p " +
+            "LEFT JOIN FETCH p.category c " +
+            "LEFT JOIN FETCH p.productDetails pd " +
+            "LEFT JOIN FETCH pd.animal a " +
+            "LEFT JOIN FETCH pd.country co " +
+            "WHERE (:keyword IS NULL OR p.productName LIKE %:keyword% OR p.description LIKE %:keyword%) " +
+            "AND (:category IS NULL OR c.categoryName = :category)")
+    Page<Product> searchProducts(@Param("keyword") String keyword, @Param("category") String category, Pageable pageable);
+
+
+
+
+
+
 }

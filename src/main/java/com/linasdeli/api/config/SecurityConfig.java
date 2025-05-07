@@ -57,7 +57,7 @@ public class SecurityConfig {
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowedOrigins(List.of("https://localhost:5173","https://linas-deli.ca","https://34.236.151.248:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:5173","https://linas-deli.ca","https://34.236.151.248:5173"));
         config.setAllowCredentials(true); // Credentials (쿠키, 인증 정보) 허용
 
         source.registerCorsConfiguration("/**", config);
