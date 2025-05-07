@@ -2,6 +2,7 @@ package com.linasdeli.api.controller;
 
 import com.linasdeli.api.dto.request.PasswordChangedRequestDTO;
 import com.linasdeli.api.service.UserDetailsServiceImpl;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;

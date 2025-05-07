@@ -15,9 +15,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:uploads/");
     }
 
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new StringToAllergyTypeConverter());
-    }
+//    @Override
+//    public void addFormatters(FormatterRegistry registry) {
+//        registry.addConverter(new StringToAllergyTypeConverter());
+//    }
 
 }
