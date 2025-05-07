@@ -27,8 +27,6 @@ public class Cost {
     @Column(nullable = false, length = 10)
     private PriceType priceType;
     @Column(nullable = false, precision = 10, scale = 2) private BigDecimal supplierPrice;
-    @Column(precision = 10, scale = 2) // ❌ nullable = false 삭제
-    private BigDecimal divisor;
     @Column(nullable = false, precision = 10, scale = 2) private BigDecimal retailPrice;
     private Integer plu; // Code for weight-pricetype items
 }
