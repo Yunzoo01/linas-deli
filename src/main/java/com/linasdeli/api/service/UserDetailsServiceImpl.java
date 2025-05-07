@@ -1,6 +1,7 @@
 package com.linasdeli.api.service;
 
 import com.linasdeli.api.domain.User;
+import com.linasdeli.api.dto.request.PasswordChangedRequestDTO;
 import com.linasdeli.api.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 user.getPassword(),
                 authorities
         );
+    }
+
+    public void changePassword(String id, String currentPassword, String newPassword) {
+        User user = userRepository.findByIdCustom(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("❌ Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
 }
