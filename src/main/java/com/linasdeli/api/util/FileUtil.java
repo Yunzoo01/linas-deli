@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class FileUtil {
 
-    private final String BASE_UPLOAD_PATH = "uploads/";
+    private final String BASE_UPLOAD_PATH = "upload/";
 
     @PostConstruct
     public void init() {
@@ -36,7 +36,7 @@ public class FileUtil {
             Path filePath = uploadPath.resolve(uniqueName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            String url = "/uploads/" + folderName + "/" + uniqueName;
+            String url = "/upload/" + folderName + "/" + uniqueName;
             return new UploadResult(uniqueName, url);
 
         } catch (IOException e) {
