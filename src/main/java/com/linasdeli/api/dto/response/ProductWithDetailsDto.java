@@ -18,6 +18,7 @@ public class ProductWithDetailsDto {
     private String animalName;
     private List<AllergyType> allergies;
     private String countryName;
+    private String servingSuggestion;
 
     public ProductWithDetailsDto(Integer pid,
                                  String imageName,
@@ -30,7 +31,8 @@ public class ProductWithDetailsDto {
                                  String categoryName,
                                  String animalName,
                                  List<AllergyType> allergies,
-                                 String countryName) {
+                                 String countryName,
+                                 String servingSuggestion) {
         this.pid = pid;
         this.imageName = imageName;
         this.imageUrl = imageUrl;
@@ -43,6 +45,7 @@ public class ProductWithDetailsDto {
         this.animalName = animalName;
         this.allergies = allergies;
         this.countryName = countryName;
+        this.servingSuggestion = servingSuggestion;
     }
 
     public Integer getPid() {
@@ -140,5 +143,13 @@ public class ProductWithDetailsDto {
 
     public void setAllergies(List<AllergyType> allergies) {
         this.allergies = allergies;
+    }
+
+    public String getServingSuggestion() {
+        return servingSuggestion;
+    }
+
+    public void setServingSuggestion(String servingSuggestion) {
+        this.servingSuggestion = servingSuggestion;
     }
 }

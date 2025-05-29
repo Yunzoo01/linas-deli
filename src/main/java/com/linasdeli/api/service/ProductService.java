@@ -227,7 +227,8 @@ public class ProductService {
                 p.getCategory().getCategoryName(),
                 p.getProductDetails().isEmpty()? null : p.getProductDetails().get(0).getAnimal().getAnimalName(),
                 p.getAllergies(), // 여기가 핵심!
-                p.getProductDetails().isEmpty()? null : p.getProductDetails().get(0).getCountry().getCountryName()
+                p.getProductDetails().isEmpty()? null : p.getProductDetails().get(0).getCountry().getCountryName(),
+                p.getServingSuggestion()
         ));
         return dtoPage;
     }
