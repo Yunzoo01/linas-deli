@@ -57,13 +57,14 @@ public class ProductService {
     }
 
     public ProductDTO createProduct(ProductRequestDTO dto, MultipartFile productImage, MultipartFile ingredientsImage) {
-        log.info(String.valueOf(dto.getSupplierId()));
-        // 엔티티들 조회
+        log.info("📦 Creating product: " + dto.getProductName());
+        log.info("💾 DTO: " + dto.toString());
+
+        // ✅ 필수 엔티티 조회
         Supplier supplier = supplierRepository.findById(dto.getSupplierId()).orElseThrow();
         Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow();
-        Animal animal = animalRepository.findById(dto.getAnimalId()).orElseThrow();
-        Country country = countryRepository.findById(dto.getOriginId()).orElseThrow();
 
+        // ✅ Product 생성
         Product product = new Product();
         product.setProductName(dto.getProductName());
         product.setSupplier(supplier);
@@ -76,7 +77,7 @@ public class ProductService {
         product.setCreatedAt(LocalDateTime.now());
         product.setUpdatedAt(LocalDateTime.now());
 
-        // ✅ 이미지 저장 (파일명 + URL)
+        // ✅ 이미지 저장
         if (productImage != null && !productImage.isEmpty()) {
             FileUtil.UploadResult result = fileUtil.saveImage(productImage, "product");
             product.setImageUrl(result.getUrl());
@@ -89,14 +90,28 @@ public class ProductService {
             product.setIngredientsImageName(result.getFileName());
         }
 
-        // ProductDetail
-        ProductDetail detail = new ProductDetail();
-        detail.setProduct(product);
-        detail.setAnimal(animal);
-        detail.setCountry(country);
-        product.setProductDetails(List.of(detail));
+        // ✅ ProductDetail 생성 조건
+        if (dto.getAnimalId() != null || dto.getOriginId() != null) {
+            ProductDetail detail = new ProductDetail();
+            detail.setProduct(product);
 
-        // 저장
+            // animalId가 있을 경우만 조회
+            if (dto.getAnimalId() != null) {
+                Animal animal = animalRepository.findById(dto.getAnimalId()).orElseThrow();
+                detail.setAnimal(animal);
+            }
+
+            // originId가 있을 경우만 조회
+            if (dto.getOriginId() != null) {
+                Country country = countryRepository.findById(dto.getOriginId()).orElseThrow();
+                detail.setCountry(country);
+            }
+
+            product.setProductDetails(List.of(detail));
+        }
+
+
+        // ✅ 저장
         Product savedProduct = productRepository.save(product);
 
         Cost cost = new Cost();
@@ -105,6 +120,7 @@ public class ProductService {
         cost.setSupplierPrice(BigDecimal.valueOf(dto.getSupplierPrice()));
         cost.setRetailPrice(BigDecimal.valueOf(dto.getSalePrice()));
         cost.setPlu(dto.getPlu());
+
         Cost savedCost = costRepository.save(cost);
 
         return new ProductDTO(savedProduct, savedCost);
