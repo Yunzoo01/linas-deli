@@ -213,7 +213,7 @@ public class ProductService {
     // ✅ Customer - 상품 전체 조회 (카테고리+검색)
     public Page<ProductWithDetailsDto> getProductsForCustomer(Pageable pageable, String category, String keyword) {
         Pageable fixedPageable = PageRequest.of(pageable.getPageNumber(), 12);
-        Page<Product> products = productRepository.searchProducts(keyword, category, fixedPageable);
+        Page<Product> products = productRepository.searchProductsInStock(keyword, category, fixedPageable);
 
         Page<ProductWithDetailsDto> dtoPage = products.map(p -> new ProductWithDetailsDto(
                 p.getPid(),
@@ -228,7 +228,8 @@ public class ProductService {
                 p.getProductDetails().isEmpty()? null : p.getProductDetails().get(0).getAnimal().getAnimalName(),
                 p.getAllergies(), // 여기가 핵심!
                 p.getProductDetails().isEmpty()? null : p.getProductDetails().get(0).getCountry().getCountryName(),
-                p.getServingSuggestion()
+                p.getServingSuggestion(),
+                p.isInStock()
         ));
         return dtoPage;
     }
