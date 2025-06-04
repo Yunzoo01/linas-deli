@@ -280,4 +280,21 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    @Transactional
+    public void deleteProductById(Integer pid) {
+        Product product = productRepository.findById(pid)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        // 이미지 경로가 있으면 삭제
+        if (product.getImageName() != null) {
+            fileUtil.deleteFile("product/" + product.getImageName());
+        }
+        if (product.getIngredientsImageName() != null) {
+            fileUtil.deleteFile("ingredients/" + product.getIngredientsImageName());
+        }
+
+        // 실제 삭제 (cascade로 자식 테이블 자동 삭제)
+        productRepository.delete(product);
+    }
+
 }

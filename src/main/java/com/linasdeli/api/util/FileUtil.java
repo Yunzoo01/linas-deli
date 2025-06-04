@@ -57,4 +57,16 @@ public class FileUtil {
         public String getFileName() { return fileName; }
         public String getUrl() { return url; }
     }
+
+    public boolean deleteFile(String relativePath) {
+        try {
+            Path filePath = Paths.get("upload").resolve(relativePath);
+            System.out.println("삭제 대상 경로: " + filePath.toAbsolutePath()); // 로그 추가 ✅
+
+            return Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

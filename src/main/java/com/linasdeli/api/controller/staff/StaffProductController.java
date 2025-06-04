@@ -96,4 +96,10 @@ public class StaffProductController {
         productService.updateInStock(id, inStock);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Integer id) {
+        productService.deleteProductById(id);
+        return ResponseEntity.noContent().build(); // 204 No Content
+    }
 }
