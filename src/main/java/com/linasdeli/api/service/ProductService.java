@@ -146,14 +146,25 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
 
-        // 이미지 새로 업로드했을 경우 처리
+        // ✅ 기존 product 이미지 삭제 후 새로 저장
         if (productImage != null && !productImage.isEmpty()) {
+            // 기존 이미지 삭제
+            if (product.getImageName() != null) {
+                fileUtil.deleteFile("product/" + product.getImageName());
+            }
+
+            // 새 이미지 저장
             FileUtil.UploadResult result = fileUtil.saveImage(productImage, "product");
             product.setImageUrl(result.getUrl());
             product.setImageName(result.getFileName());
         }
 
+        // ✅ 기존 ingredients 이미지 삭제 후 새로 저장
         if (ingredientsImage != null && !ingredientsImage.isEmpty()) {
+            if (product.getIngredientsImageName() != null) {
+                fileUtil.deleteFile("ingredients/" + product.getIngredientsImageName());
+            }
+
             FileUtil.UploadResult result = fileUtil.saveImage(ingredientsImage, "ingredients");
             product.setIngredientsImageUrl(result.getUrl());
             product.setIngredientsImageName(result.getFileName());
@@ -177,6 +188,7 @@ public class ProductService {
 
         productRepository.save(product);
 
+        // Cost 업데이트
         Cost cost = costRepository.findByProduct(product).stream().findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No cost info"));
 
