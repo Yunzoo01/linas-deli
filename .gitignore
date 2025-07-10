@@ -233,3 +233,5 @@ gradle-app.setting
 
 workspace.xml
 # End of https://www.toptal.com/developers/gitignore/api/java,gradle,intellij+all,windows,macos,visualstudiocode
+
+application.yaml
